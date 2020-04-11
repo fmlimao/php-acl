@@ -1,0 +1,21 @@
+{
+    "name": "lmacedo/php-acl",
+    "description": "Simples ACL em PHP para todos os projetos.",
+    "type": "library",
+    "version": "1.0.0",
+    "authors": [
+        {
+            "name": "Leandro Macedo",
+            "email": "fmlimao@gmail.com",
+            "role": "creator"
+        }
+    ],
+    "require": {
+        "php": ">5.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Fmlimao\\": "src"
+        }
+    }
+}

@@ -1,2 +1,2 @@
-# php-acl
-Simples ACL em PHP
+# ACL PHP
+Simples ACL em PHP para todos os projetos.
