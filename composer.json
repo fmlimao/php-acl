@@ -1,5 +1,5 @@
 {
-    "name": "lmacedo/php-acl",
+    "name": "fmlimao/php-acl",
     "description": "Simples ACL em PHP para todos os projetos.",
     "type": "library",
     "version": "1.0.0",
