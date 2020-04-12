@@ -8,6 +8,8 @@ E quando eu digo simples, é simples mesmo!
 
 ## Como usar
 
+    $acl = new Fmlimao\Acl;
+
 Basicamente, basta você associar um Papel a um Recurso e a um Privilégio no momento de dar a permissão ou
 de remover a permissão:
 
@@ -54,3 +56,46 @@ Também é possível passar um array nos argumentos:
 
     $isAllowed = $acl->isAllowed(['Papel 1', 'Papel 2'], ['Recurso 1', Recurso 2', Recurso 3'], ['Privilégio 1']);
     
+
+## Herança de Papeis
+
+Os Papeis poderão estar vinculadas umas as outras, gerando uma herança entre elas.
+
+    $acl = new Fmlimao\Acl;
+    
+    $acl->addRole('Papel 1');
+    
+    // Papel 2 é filho do Papel 1.
+    $acl->addRole('Papel 2', 'Papel 1');
+    
+    // Papel 3 é filho do Papel 2.
+    $acl->addRole('Papel 3', 'Papel 2');
+    
+    // Papel 4 é filho do Papel 3.
+    $acl->addRole('Papel 4', 'Papel 3');
+    
+    $acl->allow('Papel 1', 'Recurso 1', 'Listar');
+    $acl->allow('Papel 2', 'Recurso 1', 'Criar');
+    $acl->allow('Papel 3', 'Recurso 1', 'Exibir');
+    $acl->allow('Papel 4', 'Recurso 1', ['Alterar', 'Deletar']);
+    $acl->deny('Papel 4', 'Recurso 1', 'Listar');
+    
+    $alloweds = [];
+    
+    // Retorna TRUE por causa do Papel 2.
+    $alloweds[] = $acl->isAllowed('Papel 4', 'Recurso 1', 'Criar');
+    
+    // Retorna TRUE por causa do Papel 3.
+    $alloweds[] = $acl->isAllowed('Papel 4', 'Recurso 1', 'Exibir');
+    
+    // Retorna TRUE por causa do próprio Papel 4.
+    $alloweds[] = $acl->isAllowed('Papel 4', 'Recurso 1', 'Alterar');
+    
+    // Retorna FALSE pois nem o papel atual e nem seus pais tem esse privilégio.
+    $alloweds[] = $acl->isAllowed('Papel 4', 'Recurso 1', 'Vincular');
+    
+    // Retorna FALSE. Apesar do Papel 1 ter esse privilégio, foi retirado do Papel 4
+    $alloweds[] = $acl->isAllowed('Papel 4', 'Recurso 1', 'Listar');
+    
+    var_dump($alloweds);
+

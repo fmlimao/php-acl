@@ -245,18 +245,13 @@ class Acl
                     $value = $_privilege['value'];
 
                     if (!is_null($value)) return !!$value;
-                    
-                    if ($_role['type'] == 'role') {
-                        $roleName = $_role['name'];
 
-                        if (isset($this->roles[$roleName])) {
-                            $parents = $this->roles[$roleName]['parents'];
-                            $value = null;
-                            foreach ($parents as $parent) {
-                                $value = $this->isAllowed($parent, $resource, $privilege, ++$tab);
-                            }
-                            return $value;
+                    if (isset($this->roles[$role])) {
+                        $parents = $this->roles[$role]['parents'];
+                        foreach ($parents as $parent) {
+                            $value = $this->isAllowed($parent, $resource, $privilege, ++$tab);
                         }
+                        return !!$value;
                     }
 
                     return !!$value;
