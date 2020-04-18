@@ -5,19 +5,39 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/functions.php';
 
-$acl = new Fmlimao\Acl;
+$acl = rolesPermissions(new Fmlimao\Acl);
 
-$acl->allow(null, ['products', 'categories'], 'list');
-$acl->allow('client', ['products', 'categories'], ['list', 'create', 'edit']);
-$acl->allow('client', 'orders', null);
-$acl->allow('admin');
+$allRoles = [
+    'guest',
+    'operator-collections',
+    'operator-sales',
+    'operator',
+    'supervisor-collections',
+    'supervisor-sales',
+    'supervisor',
+    'manager-collections',
+    'manager-sales',
+    'manager',
+    'admin',
+];
 
-function showAllowedLabel($isAllowed) {
-    $class = $isAllowed ? 'label-success' : 'label-danger';
-    $text = $isAllowed ? 'True' : 'False';
-    return '<span class="label ' . $class . '">' . $text . '</span>';
-}
+$allResources = [
+    'acl',
+    'registration',
+    'sales',
+    'collections',
+];
+
+$allPrivileges = [
+    'all',
+    'list',
+    'create',
+    'show',
+    'update',
+    'delete',
+];
 
 ?>
 
@@ -29,56 +49,35 @@ function showAllowedLabel($isAllowed) {
     <table class="table table-bordered">
         <thead>
         <tr>
-            <th>Roles</th>
-            <th>Resources</th>
-            <th>Privileges</th>
-            <th class="text-center">Allowed?</th>
+            <th rowspan="2">Roles</th>
+            <th rowspan="2">Resources</th>
+            <th class="text-center" colspan="<?php echo count($allPrivileges); ?>">Privileges</th>
+        </tr>
+        <tr>
+            <?php foreach ($allPrivileges as $privilege) : ?>
+                <th class="text-center"><?php echo $privilege; ?></th>
+            <?php endforeach; ?>
         </tr>
         </thead>
 
         <tbody>
-        <tr>
-            <td>All</td>
-            <td>Products</td>
-            <td>List</td>
-            <td class="text-center"><?php echo showAllowedLabel($acl->isAllowed(null, 'products', 'list')); ?></td>
-        </tr>
-        <tr>
-            <td>All</td>
-            <td>Products</td>
-            <td>Create</td>
-            <td class="text-center"><?php echo showAllowedLabel($acl->isAllowed(null, 'products', 'create')); ?></td>
-        </tr>
-        <tr>
-            <td>Client</td>
-            <td>Products</td>
-            <td>Create</td>
-            <td class="text-center"><?php echo showAllowedLabel($acl->isAllowed('client', 'products', 'create')); ?></td>
-        </tr>
-        <tr>
-            <td>Client</td>
-            <td>Categories OR Payments</td>
-            <td>Edit</td>
-            <td class="text-center"><?php echo showAllowedLabel($acl->isAllowed('client', ['categories', 'payments'], 'edit')); ?></td>
-        </tr>
-        <tr>
-            <td>Client</td>
-            <td>Categories</td>
-            <td>Delete</td>
-            <td class="text-center"><?php echo showAllowedLabel($acl->isAllowed('client', 'categories', 'delete')); ?></td>
-        </tr>
-        <tr>
-            <td>Client</td>
-            <td>Orders</td>
-            <td>All</td>
-            <td class="text-center"><?php echo showAllowedLabel($acl->isAllowed('client', 'orders')); ?></td>
-        </tr>
-        <tr>
-            <td>Admin</td>
-            <td>All</td>
-            <td>All</td>
-            <td class="text-center"><?php echo showAllowedLabel($acl->isAllowed('admin')); ?></td>
-        </tr>
+        <?php foreach ($allRoles as $role) : ?>
+            <tr>
+                <td rowspan="<?php echo count($allResources); ?>"><?php echo $role; ?></td>
+                <td><?php echo $allResources[0]; ?></td>
+                <?php foreach ($allPrivileges as $privilege) : ?>
+                    <td class="text-center"><?php echo showAllowedLabel($acl, $role, $allResources[0], $privilege); ?></td>
+                <?php endforeach; ?>
+            </tr>
+            <?php foreach ($allResources as $k => $resource) : if (!$k) continue; ?>
+                <tr>
+                    <td><?php echo $resource; ?></td>
+                    <?php foreach ($allPrivileges as $privilege) : ?>
+                        <td class="text-center"><?php echo showAllowedLabel($acl, $role, $resource, $privilege); ?></td>
+                    <?php endforeach; ?>
+                </tr>
+            <?php endforeach; ?>
+        <?php endforeach; ?>
         </tbody>
     </table>
 </div>
