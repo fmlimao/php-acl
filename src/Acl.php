@@ -215,7 +215,7 @@ class Acl
         $this->setValue($role, $resource, $privilege, 0);
     }
 
-    public function isAllowed($role = null, $resource = null, $privilege = null, $tab = 0)
+    public function isAllowed($role = null, $resource = null, $privilege = null)
     {
         if (is_array($role)) {
             $isAllowedRole = [];
@@ -238,20 +238,49 @@ class Acl
                     }
                     return !!count(array_filter($isAllowedPrivilege));
                 } else {
-                    $_role = (is_null($role) || !isset($this->rules['byRole'][$role])) ? $this->rules['allRoles'] : $this->rules['byRole'][$role];
-                    $_resource = (is_null($resource) || !isset($_role['byResource'][$resource])) ? $_role['allResources'] : $_role['byResource'][$resource];
-                    $_privilege = (is_null($privilege) || !isset($_resource['byPrivilege'][$privilege])) ? $_resource['allPrivileges'] : $_resource['byPrivilege'][$privilege];
+                    $value = null;
 
-                    $value = $_privilege['value'];
+                    $checkOrder = [
+                        ['byRole', $role, 'byResource', $resource, 'byPrivilege', $privilege],
+                        ['byRole', $role, 'byResource', $resource, 'allPrivileges'],
+                        ['byRole', $role, 'allResources', 'byPrivilege', $privilege],
+                        ['byRole', $role, 'allResources', 'allPrivileges'],
+                        ['allRoles', 'byResource', $resource, 'byPrivilege', $privilege],
+                        ['allRoles', 'byResource', $resource, 'allPrivileges'],
+                        ['allRoles', 'allResources', 'byPrivilege', $privilege],
+                        ['allRoles', 'allResources', 'allPrivileges'],
+                    ];
+
+                    $value = null;
+
+                    foreach ($checkOrder as $o) {
+                        $obj = $this->rules;
+
+                        $ok = true;
+                        foreach ($o as $k) {
+                            if (!isset($obj[$k])) {
+                                $ok = false;
+                                break;
+                            }
+
+                            $obj = $obj[$k];
+                        }
+
+                        if (!$ok) continue;
+
+                        if (!is_null($obj['value'])) {
+                            $value = $obj['value'];
+                            break;
+                        }
+                    }
 
                     if (!is_null($value)) return !!$value;
 
                     if (isset($this->roles[$role])) {
                         $parents = $this->roles[$role]['parents'];
                         foreach ($parents as $parent) {
-                            $value = $this->isAllowed($parent, $resource, $privilege, ++$tab);
+                            $value = $this->isAllowed($parent, $resource, $privilege);
                         }
-                        return !!$value;
                     }
 
                     return !!$value;
