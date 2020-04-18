@@ -2,7 +2,7 @@
     "name": "fmlimao/php-acl",
     "description": "Simples ACL em PHP para todos os projetos.",
     "type": "library",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "license": "MIT",
     "scripts": {
         "test": "./vendor/bin/phpunit --testdox tests"
