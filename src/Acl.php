@@ -44,7 +44,7 @@ class Acl
                         $this->addRole($role, $p);
                     }
                     return;
-                } else if (is_string($parent)) {
+                } elseif (is_string($parent)) {
                     $this->addRole($parent);
 
                     if (!in_array($parent, $this->roles[$role]['parents'])) {
@@ -95,7 +95,7 @@ class Acl
                     'byPrivilege' => [],
                 ];
             }
-        } else if (!is_null($resource)) {
+        } elseif (!is_null($resource)) {
             if (!isset($this->rules['allRoles']['byResource'][$resource])) {
                 $this->rules['allRoles']['byResource'][$resource] = [
                     'type' => 'resource',
@@ -176,17 +176,23 @@ class Acl
     public function allow($role = null, $resource = null, $privilege = null)
     {
         if (is_array($role)) {
-            foreach ($role as $r) $this->allow($r, $resource, $privilege);
+            foreach ($role as $r) {
+                $this->allow($r, $resource, $privilege);
+            }
             return;
         }
 
         if (is_array($resource)) {
-            foreach ($resource as $r) $this->allow($role, $r, $privilege);
+            foreach ($resource as $r) {
+                $this->allow($role, $r, $privilege);
+            }
             return;
         }
 
         if (is_array($privilege)) {
-            foreach ($privilege as $r) $this->allow($role, $resource, $r);
+            foreach ($privilege as $r) {
+                $this->allow($role, $resource, $r);
+            }
             return;
         }
 
@@ -197,17 +203,23 @@ class Acl
     public function deny($role = null, $resource = null, $privilege = null)
     {
         if (is_array($role)) {
-            foreach ($role as $r) $this->deny($r, $resource, $privilege);
+            foreach ($role as $r) {
+                $this->deny($r, $resource, $privilege);
+            }
             return;
         }
 
         if (is_array($resource)) {
-            foreach ($resource as $r) $this->deny($role, $r, $privilege);
+            foreach ($resource as $r) {
+                $this->deny($role, $r, $privilege);
+            }
             return;
         }
 
         if (is_array($privilege)) {
-            foreach ($privilege as $r) $this->deny($role, $resource, $r);
+            foreach ($privilege as $r) {
+                $this->deny($role, $resource, $r);
+            }
             return;
         }
 
@@ -266,7 +278,9 @@ class Acl
                             $obj = $obj[$k];
                         }
 
-                        if (!$ok) continue;
+                        if (!$ok) {
+                            continue;
+                        }
 
                         if (!is_null($obj['value'])) {
                             $value = $obj['value'];
@@ -274,7 +288,9 @@ class Acl
                         }
                     }
 
-                    if (!is_null($value)) return !!$value;
+                    if (!is_null($value)) {
+                        return !!$value;
+                    }
 
                     if (isset($this->roles[$role])) {
                         $parents = $this->roles[$role]['parents'];
